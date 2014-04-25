@@ -16,27 +16,53 @@
 			*		<head>
 			*			<title>Drawing Window</title>
 			*		</head>
-			*		<body> <canvas id=\"thecanvas\" height=\"500\" width=\"500\" style=\"border:1px solid black\"> </body>
+			*		<body> <canvas id=\"theCanvas\" height=\"500\" width=\"500\" style=\"border:1px solid black\"> </body>
 			*/
 			var drawingWindow;
 
-			var sMax = 0;
-			var sMin = 0;
-			var bMax = 0;
-			var bMin = 0;
-			var cMax = 0;
-			var cMin = 0;
+			var S1 = -0.0500;
+			var B1 = 0.0300;
+			var C1 = 0;
+			var H1 = 0.800;
+
+			var S2 = -0.0210;
+			var B2 = 0.00900;
+			var C2 = 0.0260;
+			var H2 = 0.831;
+
+			var columns = [[S1, B1, C1, H1], [S2, B2, C2, H2]];
+
+			var numberOfColumns = 0;
+
+			var normalizedColumns = [];
+
+			var sHNormalizedWeight = 0;
+			var bHNormalizedWeight = 0;
+			var cHNormalizedWeight = 0;
+
+			var scaledWeightedColumns = [];
+
+			var normalizedScaledWeightedColumns = [];
+
+			var columnPoints = [];
+
+			var sHMax = 0;
+			var sHMin = 0;
+			var bHMax = 0;
+			var bHMin = 0;
+			var cHMax = 0;
+			var cHMin = 0;
 
 			/**
-			* Initalizer to create the drawingWindow
+			* Initializer to create the drawingWindow
 			*/
 			function drawingWindowInit() {
 				drawingWindow  = window.open("","_blank", "resizable=yes, width=525, height=525");
-				drawingWindow.document.write("<html><head><title>Drawing Window</title></head><body><canvas id=\"thecanvas\" height=\"500\" width=\"500\"></body>");
+				drawingWindow.document.write("<html><head><title>Drawing Window</title></head><body><canvas id=\"theCanvas\" height=\"500\" width=\"500\"></body>");
 			}
 
 			/**
-			* Helper function to draw the Comparion Triangle
+			* Helper function to draw the Comparison Triangle
 			*/
 			function drawComparisonTriangle(canvas, context) {
 				canvasLength = canvas.height; // The canvas is a square so the length of the square is ether the height or the width
@@ -58,7 +84,7 @@
 			function plotColumns(columns, columnOfIntrest, canvas, context, radius) {
 				//For loop for each column
     			for(var i=0; i<columns.length; i++) {
-    				if(columnOfIntrest["x"] == columns[i]["x"] && columnOfIntrest["y"] == columns[i]["y"]) { // Checks if the column is the column of intrest
+    				if(columnOfIntrest["x"] == columns[i]["x"] && columnOfIntrest["y"] == columns[i]["y"]) { // Checks if the column is the column of interest
     					context.fillStyle="#2B65EC";
     				} else {
     					context.fillStyle="#000000";
@@ -72,53 +98,91 @@
 			}
 
 			// normalizeColumns: array-of-SBCH-values -> 
-			function normalizeColumns(columns) {
-				for(var column in columns) {
-					
+			function normalizeColumns() {
+				// NEEDS TESTING
+				numberOfColumns = columns.length;
+				for(var i =0; i < numberOfColumns; i++) {
+					var column = columns[i];
+					var sH = column.S/column.H;
+					var bH = column.B/column.H;
+					var cH = column.C/column.H;
+					if(i === 0) {sHMax = sH; sHMin = sH; bHMax = bH; bHMin = bH; cHMax = cH; cHMin = cH;}
+					if (sH > sHMax) { sHMax = sH;} 
+					if (sH < sHMin) { sHMin = sH;}
+					if (bH > bHMax) { bHMax = bH;} 
+					if (bH < bHMin) { bHMin = bH;}
+					if (cH > cHMax) { cHMax = cH;}	
+					if (cH < cHMin) { cHMin = cH;}
+					normalizedColumns[i] = [sH,bH,cH];
 				}
-
-
-
-
 			}
 
 			function weightColumns() {
 				normalizeColumns();
-			}
 
-			function normalizeWeights() {
-				weightColumns();
+				var sHWeight = 1 / (sHMax - sHMin);
+				var bHWeight = 1 / (bHMax - bHMin);
+				var cHWeight = 1 / (cHMax - cHMin);
+
+				sHNormalizedWeight = (sHWeight / sHWeight) * 100;
+				bHNormalizedWeight = (bHWeight / sHWeight) * 100;
+				cHNormalizedWeight = (cHWeight / sHWeight) * 100;
 			}
 
 			function scaleColumns() {
-				normalizeWeights();
+				weightColumns();
+
+				// NEEDS TESTING 
+				for(var i =0; i < numberOfColumns; i++) {
+					var sScaledWeighted = (normalizedColumns[i][0] - sHMin) * sHNormalizedWeight;
+					var bScaledWeighted = (normalizedColumns[i][1] - bHMin) * bHNormalizedWeight;
+					var cScaledWeighted = (normalizedColumns[i][2] - cHMin) * cHNormalizedWeight;
+					scaledWeightedColumns[i] = [sScaledWeighted, bScaledWeighted, cScaledWeighted];
+				}
 			}
 
 			function normalizeScaledColumns() {
 				scaleColumns();
+
+				// NEEDS TESTING 
+				for(var i =0; i < numberOfColumns; i++) {
+					var sHNormalizedScaledWeighted = scaledWeightedColumns[i][0] / (scaledWeightedColumns[i][0] + scaledWeightedColumns[i][1] + scaledWeightedColumns[i][2]);
+					var bHNormalizedScaledWeighted = scaledWeightedColumns[i][1] / (scaledWeightedColumns[i][0] + scaledWeightedColumns[i][1] + scaledWeightedColumns[i][2]);
+					var cHNormalizedScaledWeighted = scaledWeightedColumns[i][2] / (scaledWeightedColumns[i][0] + scaledWeightedColumns[i][1] + scaledWeightedColumns[i][2]);
+					normalizedScaledWeightedColumns[i] = [sHNormalizedScaledWeighted, bHNormalizedScaledWeighted, cHNormalizedScaledWeighted];
+				}
 			}
 
 			function transformColumns() {
 				normalizeScaledColumns();
+
+				// NEEDS TESTING 
+				for(var i =0; i < numberOfColumns; i++) {
+					var yPoint = normalizedScaledWeightedColumns[0][2] * Math.sin(Math.PI / 3);
+					var xPoint = normalizedScaledWeightedColumns[0][1] + (yPoint/Math.tan(Math.PI / 3);
+					columnPoints[i] = {x: xPoint, y: yPoint};
+				}
 			}
 
 			/**
-			* Retrives the columns' points that will be ploted
+			* Retrieves the columns' points that will be plotted
 			*/
 			function retriveColumnPoints() {
-				return transformColumns();
+				transformColumns();
+
+				return columnPoints;
 			}
 
 			/**
-			* Action Listioner to draw the triangle and plot the points
+			* Action Listener to draw the triangle and plot the points
 			*/
 			function clickFunction() {
-				// Checks to see if the drawingWindow needs to be initalized or if it needs to re-opened
+				// Checks to see if the drawingWindow needs to be initialized or if it needs to re-opened
 				if(!(drawingWindow && drawingWindow.closed == false)) {
 					drawingWindowInit();
 				}
 
-				var canvas  = drawingWindow.document.getElementById("thecanvas");
+				var canvas  = drawingWindow.document.getElementById("theCanvas");
 				var context = canvas.getContext("2d");
 				var radius = 5;
 
@@ -131,11 +195,12 @@
 				// Columns WILL GET FROM THE FUNCTION retriveColumnPoints()
 				columnPoints = [{x: 250, y:250}, {x:200, y:300}, {x:230, y:230}, {x:328, y:480}, {x:355, y:460}, {x:443, y:439}];// TEST retriveColumnPoints();
 
-				// Column of intrest WILL GET SOME HOW
+				// Column of interest WILL GET SOME HOW
 				var chosenColumn = {x: 250, y: 250} // TEST;
 
 				// Plots the columns
 				plotColumns(columnPoints, chosenColumn, canvas, context, radius);	
+
 			};
 		</script>
 	</body>
