@@ -20,6 +20,8 @@
 			*/
 			var drawingWindow;
 
+
+// Test Values
 			var S1 = -0.0500;
 			var B1 = 0.0300;
 			var C1 = 0;
@@ -30,7 +32,22 @@
 			var C2 = 0.0260;
 			var H2 = 0.831;
 
-			var columns = [[S1, B1, C1, H1], [S2, B2, C2, H2]];
+			var S3 = -0.0300;
+			var B3 = 0.0100;
+			var C3 = -0.0300;
+			var H3 = 0.970;
+
+			var S4 = -0.0370;
+			var B4 = 0.0310;
+			var C4 = 0.0540;
+			var H4 = 0.872;
+
+			var S5 = -0.0300;
+			var B5 = 0;
+			var C5 = 0;
+			var H5 = 0.940;
+
+			var columns = [[S1, B1, C1, H1], [S2, B2, C2, H2], [S3, B3, C3, H3], [S4, B4, C4, H4], [S5, B5, C5, H5]];
 
 			var numberOfColumns = 0;
 
@@ -84,28 +101,33 @@
 			function plotColumns(columns, columnOfIntrest, canvas, context, radius) {
 				//For loop for each column
     			for(var i=0; i<columns.length; i++) {
-    				if(columnOfIntrest["x"] == columns[i]["x"] && columnOfIntrest["y"] == columns[i]["y"]) { // Checks if the column is the column of interest
+    				if(columnOfIntrest[0] == columns[i][0] && columnOfIntrest[1] == columns[i][1]) { // Checks if the column is the column of interest
     					context.fillStyle="#2B65EC";
     				} else {
     					context.fillStyle="#000000";
     				}
     				// Drawing the point
     				context.beginPath();
-					context.arc(columns[i]["x"], columns[i]["y"] , radius, 0, 2 * Math.PI, false);
+					context.arc(columns[i][0], columns[i][1] , radius, 0, 2 * Math.PI, false);
 					context.closePath();
 					context.fill();
     			}
 			}
 
-			// normalizeColumns: array-of-SBCH-values -> 
+			/**
+			* Normalizes the columns to the H value of each column
+			*/
 			function normalizeColumns() {
-				// NEEDS TESTING
 				numberOfColumns = columns.length;
+
 				for(var i =0; i < numberOfColumns; i++) {
-					var column = columns[i];
-					var sH = column.S/column.H;
-					var bH = column.B/column.H;
-					var cH = column.C/column.H;
+
+					// Claculates Snom, Bnorm, Cnorm
+					var sH = columns[i][0]/columns[i][3];
+					var bH = columns[i][1]/columns[i][3];
+					var cH = columns[i][2]/columns[i][3];
+
+					// Finds the Max and the Min of S,B, and C
 					if(i === 0) {sHMax = sH; sHMin = sH; bHMax = bH; bHMin = bH; cHMax = cH; cHMin = cH;}
 					if (sH > sHMax) { sHMax = sH;} 
 					if (sH < sHMin) { sHMin = sH;}
@@ -113,39 +135,53 @@
 					if (bH < bHMin) { bHMin = bH;}
 					if (cH > cHMax) { cHMax = cH;}	
 					if (cH < cHMin) { cHMin = cH;}
+
 					normalizedColumns[i] = [sH,bH,cH];
 				}
 			}
 
+			/**
+			* Depends on normalizedColumns() and finds the weight of S,B, and C
+			*/
 			function weightColumns() {
 				normalizeColumns();
 
+				// Sweight, Bweight, and Cweight
 				var sHWeight = 1 / (sHMax - sHMin);
 				var bHWeight = 1 / (bHMax - bHMin);
 				var cHWeight = 1 / (cHMax - cHMin);
 
+				// normSweight, normBweight, and normCweight
 				sHNormalizedWeight = (sHWeight / sHWeight) * 100;
 				bHNormalizedWeight = (bHWeight / sHWeight) * 100;
 				cHNormalizedWeight = (cHWeight / sHWeight) * 100;
 			}
 
+			/**
+			* Depends on weightColumns() and scales each column's parameters by their respective normalized weights
+			*/
 			function scaleColumns() {
 				weightColumns();
 
-				// NEEDS TESTING 
 				for(var i =0; i < numberOfColumns; i++) {
+					// scaledS, scaledB, and scaledC
 					var sScaledWeighted = (normalizedColumns[i][0] - sHMin) * sHNormalizedWeight;
 					var bScaledWeighted = (normalizedColumns[i][1] - bHMin) * bHNormalizedWeight;
 					var cScaledWeighted = (normalizedColumns[i][2] - cHMin) * cHNormalizedWeight;
+
 					scaledWeightedColumns[i] = [sScaledWeighted, bScaledWeighted, cScaledWeighted];
 				}
 			}
 
+			/**
+			* Depends on scaleColumns() and normalizes each scaled column's parameters
+			*/
 			function normalizeScaledColumns() {
 				scaleColumns();
 
-				// NEEDS TESTING 
 				for(var i =0; i < numberOfColumns; i++) {
+
+					// Normalizes each to a factor of 1
 					var sHNormalizedScaledWeighted = scaledWeightedColumns[i][0] / (scaledWeightedColumns[i][0] + scaledWeightedColumns[i][1] + scaledWeightedColumns[i][2]);
 					var bHNormalizedScaledWeighted = scaledWeightedColumns[i][1] / (scaledWeightedColumns[i][0] + scaledWeightedColumns[i][1] + scaledWeightedColumns[i][2]);
 					var cHNormalizedScaledWeighted = scaledWeightedColumns[i][2] / (scaledWeightedColumns[i][0] + scaledWeightedColumns[i][1] + scaledWeightedColumns[i][2]);
@@ -153,22 +189,33 @@
 				}
 			}
 
-			function transformColumns() {
+			/**
+			* Depends on normalizeScaledColumns() and tranforms each column's parameters into a (x, y) point
+			* @param the scale of the canvas
+			*/
+			function transformColumns(scale) {
 				normalizeScaledColumns();
 
-				// NEEDS TESTING 
 				for(var i =0; i < numberOfColumns; i++) {
-					var yPoint = normalizedScaledWeightedColumns[0][2] * Math.sin(Math.PI / 3);
-					var xPoint = normalizedScaledWeightedColumns[0][1] + (yPoint/Math.tan(Math.PI / 3);
-					columnPoints[i] = {x: xPoint, y: yPoint};
+					// x and y points scaled to 1
+					var yPoint = normalizedScaledWeightedColumns[i][2] * Math.sin(Math.PI / 3);
+					var xPoint = normalizedScaledWeightedColumns[i][1] + (yPoint / Math.tan(Math.PI / 3));
+
+					// x and y points scaled to the scale
+					var scaledXPoint = xPoint * scale;
+					var scaledYPoint = scale - (yPoint * scale);
+
+					columnPoints[i] = [scaledXPoint, scaledYPoint];
 				}
 			}
 
 			/**
-			* Retrieves the columns' points that will be plotted
+			* Depends on transformColumns(scale) and retrieves the columns' points that will be plotted
+			* @param the scale of the canvas
+			* @return the (x, y) points of each column that should be plotted
 			*/
-			function retriveColumnPoints() {
-				transformColumns();
+			function retriveColumnPoints(scale) {
+				transformColumns(scale);
 
 				return columnPoints;
 			}
@@ -192,15 +239,28 @@
 				// Draws comparison triangle
 				drawComparisonTriangle(canvas, context);
 
-				// Columns WILL GET FROM THE FUNCTION retriveColumnPoints()
-				columnPoints = [{x: 250, y:250}, {x:200, y:300}, {x:230, y:230}, {x:328, y:480}, {x:355, y:460}, {x:443, y:439}];// TEST retriveColumnPoints();
+				// Columns to be Plotted and Scaled to Canvas
+				columnPointsToBePlotted = retriveColumnPoints(canvas.height);
 
 				// Column of interest WILL GET SOME HOW
-				var chosenColumn = {x: 250, y: 250} // TEST;
+				var chosenColumn = columnPointsToBePlotted[0]; // TEST;
 
 				// Plots the columns
-				plotColumns(columnPoints, chosenColumn, canvas, context, radius);	
+				plotColumns(columnPoints, chosenColumn, canvas, context, radius);
 
+// Test Writings
+
+				//document.write(normalizedColumns[0][0] + " ~~~ " + normalizedColumns[0][1] + " ~~~ " + normalizedColumns[0][2] + " ~~~ " + normalizedColumns[1][0] + " ~~~ " + normalizedColumns[1][1] + " ~~~ " + normalizedColumns[1][2]);
+
+				//document.write((sHMax - sHMin) + " ~~~ " + (bHMax - bHMin) + " ~~~ " + (cHMax - cHMin));
+
+				//document.write(sHNormalizedWeight + " ~~~ " + bHNormalizedWeight + " ~~~ " + cHNormalizedWeight);
+
+				//document.write(scaledWeightedColumns[0][0] + " ~~~ " + scaledWeightedColumns[0][1] + " ~~~ " + scaledWeightedColumns[0][2] + " ~~~ " + scaledWeightedColumns[1][0] + " ~~~ " + scaledWeightedColumns[1][1] + " ~~~ " + scaledWeightedColumns[1][2]);
+
+				//document.write(normalizedScaledWeightedColumns[0][0] + " ~~~ " + normalizedScaledWeightedColumns[0][1] + " ~~~ " + normalizedScaledWeightedColumns[0][2] + " ~~~ " + normalizedScaledWeightedColumns[1][0] + " ~~~ " + normalizedScaledWeightedColumns[1][1] + " ~~~ " + normalizedScaledWeightedColumns[1][2]);
+
+				//document.write(columnPointsToBePlotted[0][0] + " ~~~ " + columnPointsToBePlotted[0][1] + " ~~~ " + columnPointsToBePlotted[1][0] + " ~~~ " + columnPointsToBePlotted[1][1])
 			};
 		</script>
 	</body>
