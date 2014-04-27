@@ -2,294 +2,345 @@
 
 <!--Author=Dustin Luhmann-->
 <html>
-	<head>
-		<title>
-			Test Javascript for Final Project
-		</title>
-	</head>
-	<body>
-		<button type="button" onclick="clickFunction()">Test Drawing</button>
 
-		<script type="text/javascript">
-			/*
-			* This is the HTML code the drawing window will have in it.
-			* This is needed to set the title and create the canvas in the window
-			*	<html>
-			*		<head>
-			*			<title>Drawing Window</title>
-			*		</head>
-			*		<body> <canvas id=\"theCanvas\" height=\"500\" width=\"500\"
-            *         style=\"border:1px solid black\"> </body>
-			*/
-			var drawingWindow;
+<head>
+    <title>
+        Test Javascript for Final Project
+    </title>
+</head>
 
-            // TODO: This needs to be changed to legitimate data values
-			// Test Values
-			var S1 = -0.0500;
-			var B1 = 0.0300;
-			var C1 = 0;
-			var H1 = 0.800;
+<body>
+    <button type="button" onclick="clickFunction()">Test Drawing</button>
 
-			var S2 = -0.0210;
-			var B2 = 0.00900;
-			var C2 = 0.0260;
-			var H2 = 0.831;
+    <script type="text/javascript">
+        /*
+         * This is the HTML code the drawing window will have in it.
+         * This is needed to set the title and create the canvas in the window
+         *	<html>
+         *		<head>
+         *			<title>Drawing Window</title>
+         *		</head>
+         *		<body> <canvas id=\"theCanvas\" height=\"500\" width=\"500\"
+         *         style=\"border:1px solid black\"> </body>
+         */
+        var drawingWindow;
 
-			var S3 = -0.0300;
-			var B3 = 0.0100;
-			var C3 = -0.0300;
-			var H3 = 0.970;
+         // TODO: This needs to be changed to legitimate data values
+         // Test Values
+        var S1 = -0.0500;
+        var B1 = 0.0300;
+        var C1 = 0;
+        var H1 = 0.800;
 
-			var S4 = -0.0370;
-			var B4 = 0.0310;
-			var C4 = 0.0540;
-			var H4 = 0.872;
+        var S2 = -0.0210;
+        var B2 = 0.00900;
+        var C2 = 0.0260;
+        var H2 = 0.831;
 
-			var S5 = -0.0300;
-			var B5 = 0;
-			var C5 = 0;
-			var H5 = 0.940;
+        var S3 = -0.0300;
+        var B3 = 0.0100;
+        var C3 = -0.0300;
+        var H3 = 0.970;
 
-			var columns = [[S1, B1, C1, H1], [S2, B2, C2, H2], [S3, B3, C3, H3],
-                          [S4, B4, C4, H4], [S5, B5, C5, H5]];
+        var S4 = -0.0370;
+        var B4 = 0.0310;
+        var C4 = 0.0540;
+        var H4 = 0.872;
 
-//Final		var columns = []
+        var S5 = -0.0300;
+        var B5 = 0;
+        var C5 = 0;
+        var H5 = 0.940;
 
-			var numberOfColumns = 0;
+        var columns = [
+            [S1, B1, C1, H1],
+            [S2, B2, C2, H2],
+            [S3, B3, C3, H3],
+            [S4, B4, C4, H4],
+            [S5, B5, C5, H5]
+        ];
 
-			var normalizedColumns = [];
+         //Final		var columns = []
 
-			var sHNormalizedWeight = 0;
-			var bHNormalizedWeight = 0;
-			var cHNormalizedWeight = 0;
+        var numberOfColumns = 0;
 
-			var scaledWeightedColumns = [];
+        var normalizedColumns = [];
 
-			var normalizedScaledWeightedColumns = [];
+        var sHNormalizedWeight = 0;
+        var bHNormalizedWeight = 0;
+        var cHNormalizedWeight = 0;
 
-			var columnPoints = [];
+        var scaledWeightedColumns = [];
 
-			var sHMax = 0;
-			var sHMin = 0;
-			var bHMax = 0;
-			var bHMin = 0;
-			var cHMax = 0;
-			var cHMin = 0;
+        var normalizedScaledWeightedColumns = [];
 
-			/**
-			* Initializer to create the drawingWindow
-			*/
-			function drawingWindowInit() {
-				drawingWindow  = window.open("","_blank", "resizable=yes, width=525, height=525");
-				drawingWindow.document.write("<html><head><title>Data Visualizer</title></head><body><canvas id=\"theCanvas\" height=\"500\" width=\"500\"></body>");
-			}
+        var columnPoints = [];
 
-			/**
-			* Helper function to draw the Comparison Triangle
-			* @param The drawing canvas, the "pen" for drawing, and space for drawing
-			*/
-			function drawComparisonTriangle(canvas, context, drawingGap) {
-// The canvas is a square so the length of the square is ether the height or the width
-				canvasLength = canvas.height; 
-				halfCanvasLength = canvasLength / 2;
-				triangleHeight = Math.sqrt(canvasLength * canvasLength -
-                    halfCanvasLength * halfCanvasLength);
+        var sHMax = 0;
+        var sHMin = 0;
+        var bHMax = 0;
+        var bHMin = 0;
+        var cHMax = 0;
+        var cHMin = 0;
 
-				// Triangle Section
-				context.beginPath();
-    			context.moveTo(0,canvasLength-drawingGap);
-    			context.lineTo(canvasLength,canvasLength-drawingGap);
-    			context.lineTo(halfCanvasLength,(canvasLength - triangleHeight)-drawingGap);
-    			context.lineTo(0,canvasLength-drawingGap);
-    			context.closePath();
-    			context.strokeStyle="#000000";
-    			context.stroke();
+        /**
+         * Initializer to create the drawingWindow
+         */
+        function drawingWindowInit() {
+            drawingWindow = window.open("", "_blank",
+                "resizable=yes, width=525, height=525");
+            drawingWindow.document.write(
+                "<html><head><title>Data Visualizer</title></head><body><canvas id=\"theCanvas\" height=\"500\" width=\"500\"></body>"
+            );
+        }
 
-    			// Labels
-    			context.font = "bold 32px Sans-Serif";
-  				context.fillText("S", (canvasLength / 8), halfCanvasLength);
-  				context.fillText("C", canvasLength - (canvasLength / 8), halfCanvasLength);
-  				context.textAlign="center";
-  				context.fillText("B", halfCanvasLength, canvasLength);
-  				context.fillText("Column Visualizer", halfCanvasLength, (canvasLength / 16));
-			}
+        /**
+         * Helper function to draw the Comparison Triangle
+         * @param The drawing canvas, the "pen" for drawing, and space for drawing
+         */
+        function drawComparisonTriangle(canvas, context, drawingGap) {
+            // The canvas is a square so the length of the square is ether the height or the width
+            canvasLength = canvas.height;
+            halfCanvasLength = canvasLength / 2;
+            triangleHeight = Math.sqrt(canvasLength * canvasLength -
+                halfCanvasLength * halfCanvasLength);
 
-			/**
-			* Plots each column as a point in the triangle
-			* @param points of the columns being plotted, point that will be
-            * highlighted, the drawing canvas, the "pen" for drawing, and size
-            * of the points being plotted
-			*/
-			function plotColumns(columns, columnOfIntrest, canvas, context, radius) {
-				//For loop for each column
-    			for(var i=0; i<columns.length; i++) {
-                    // Checks if the column is the column of interest
-    				if(columnOfIntrest[0] == columns[i][0] &&
-                         columnOfIntrest[1] == columns[i][1]) { 
-    					context.fillStyle="#2B65EC";
-    				} else {
-    					context.fillStyle="#000000";
-    				}
-    				
-    				// Drawing the point
-    				context.beginPath();
-					context.arc(columns[i][0], columns[i][1] , radius, 0, 2 * Math.PI, false);
-					context.closePath();
-					context.fill();
-    			}
-			}
+            // Triangle Section
+            context.beginPath();
+            context.moveTo(0, canvasLength - drawingGap);
+            context.lineTo(canvasLength, canvasLength - drawingGap);
+            context.lineTo(halfCanvasLength, (canvasLength - triangleHeight) -
+                drawingGap);
+            context.lineTo(0, canvasLength - drawingGap);
+            context.closePath();
+            context.strokeStyle = "#000000";
+            context.stroke();
 
-			/**
-			* Normalizes the columns to the H value of each column
-			*/
-			function normalizeColumns() {
-				numberOfColumns = columns.length;
+            // Labels
+            context.font = "bold 32px Sans-Serif";
+            context.fillText("S", (canvasLength / 8), halfCanvasLength);
+            context.fillText("C", canvasLength - (canvasLength / 8),
+                halfCanvasLength);
+            context.textAlign = "center";
+            context.fillText("B", halfCanvasLength, canvasLength);
+            context.fillText("Column Visualizer", halfCanvasLength, (
+                canvasLength / 16));
+        }
 
-				for(var i =0; i < numberOfColumns; i++) {
+        /**
+         * Plots each column as a point in the triangle
+         * @param points of the columns being plotted, point that will be
+         * highlighted, the drawing canvas, the "pen" for drawing, and size
+         * of the points being plotted
+         */
+        function plotColumns(columns, columnOfIntrest, canvas, context, radius) {
+            //For loop for each column
+            for (var i = 0; i < columns.length; i++) {
+                // Checks if the column is the column of interest
+                if (columnOfIntrest[0] == columns[i][0] &&
+                    columnOfIntrest[1] == columns[i][1]) {
+                    context.fillStyle = "#2B65EC";
+                }
+                else {
+                    context.fillStyle = "#000000";
+                }
 
-					// Calculates sNorm, bNorm, cNorm
-					var sH = columns[i][0]/columns[i][3];
-					var bH = columns[i][1]/columns[i][3];
-					var cH = columns[i][2]/columns[i][3];
+                // Drawing the point
+                context.beginPath();
+                context.arc(columns[i][0], columns[i][1], radius, 0, 2 * Math.PI,
+                    false);
+                context.closePath();
+                context.fill();
+            }
+        }
 
-					// Finds the Max and the Min of S,B, and C
-					if(i === 0) {sHMax = sH; sHMin = sH; bHMax = bH; bHMin = bH;
-                          cHMax = cH; cHMin = cH;}
-					if (sH > sHMax) { sHMax = sH;} 
-					if (sH < sHMin) { sHMin = sH;}
-					if (bH > bHMax) { bHMax = bH;} 
-					if (bH < bHMin) { bHMin = bH;}
-					if (cH > cHMax) { cHMax = cH;}	
-					if (cH < cHMin) { cHMin = cH;}
+        /**
+         * Normalizes the columns to the H value of each column
+         */
+        function normalizeColumns() {
+            numberOfColumns = columns.length;
 
-					normalizedColumns[i] = [sH,bH,cH];
-				}
-			}
+            for (var i = 0; i < numberOfColumns; i++) {
 
-			/**
-			* Depends on normalizedColumns() and finds the weight of S,B, and C
-			*/
-			function weightColumns() {
-				normalizeColumns();
+                // Calculates sNorm, bNorm, cNorm
+                var sH = columns[i][0] / columns[i][3];
+                var bH = columns[i][1] / columns[i][3];
+                var cH = columns[i][2] / columns[i][3];
 
-				// Sweight, Bweight, and Cweight
-				var sHWeight = 1 / (sHMax - sHMin);
-				var bHWeight = 1 / (bHMax - bHMin);
-				var cHWeight = 1 / (cHMax - cHMin);
+                // Finds the Max and the Min of S,B, and C
+                if (i === 0) {
+                    sHMax = sH;
+                    sHMin = sH;
+                    bHMax = bH;
+                    bHMin = bH;
+                    cHMax = cH;
+                    cHMin = cH;
+                }
+                if (sH > sHMax) {
+                    sHMax = sH;
+                }
+                if (sH < sHMin) {
+                    sHMin = sH;
+                }
+                if (bH > bHMax) {
+                    bHMax = bH;
+                }
+                if (bH < bHMin) {
+                    bHMin = bH;
+                }
+                if (cH > cHMax) {
+                    cHMax = cH;
+                }
+                if (cH < cHMin) {
+                    cHMin = cH;
+                }
 
-				// normSweight, normBweight, and normCweight
-				sHNormalizedWeight = (sHWeight / sHWeight) * 100;
-				bHNormalizedWeight = (bHWeight / sHWeight) * 100;
-				cHNormalizedWeight = (cHWeight / sHWeight) * 100;
-			}
+                normalizedColumns[i] = [sH, bH, cH];
+            }
+        }
 
-			/**
-			* Depends on weightColumns() and scales each column's parameters by their
-            * respective normalized weights
-			*/
-			function scaleColumns() {
-				weightColumns();
+        /**
+         * Depends on normalizedColumns() and finds the weight of S,B, and C
+         */
+        function weightColumns() {
+            normalizeColumns();
 
-				for(var i =0; i < numberOfColumns; i++) {
-					// scaledS, scaledB, and scaledC
-					var sScaledWeighted = (normalizedColumns[i][0] - sHMin) * sHNormalizedWeight;
-					var bScaledWeighted = (normalizedColumns[i][1] - bHMin) * bHNormalizedWeight;
-					var cScaledWeighted = (normalizedColumns[i][2] - cHMin) * cHNormalizedWeight;
+            // sWeight, bWeight, and cWeight
+            var sHWeight = 1 / (sHMax - sHMin);
+            var bHWeight = 1 / (bHMax - bHMin);
+            var cHWeight = 1 / (cHMax - cHMin);
 
-					scaledWeightedColumns[i] = [sScaledWeighted, bScaledWeighted, cScaledWeighted];
-				}
-			}
+            // normSweight, normBweight, and normCweight
+            sHNormalizedWeight = (sHWeight / sHWeight) * 100;
+            bHNormalizedWeight = (bHWeight / sHWeight) * 100;
+            cHNormalizedWeight = (cHWeight / sHWeight) * 100;
+        }
 
-			/**
-			* Depends on scaleColumns() and normalizes each scaled column's parameters
-			*/
-			function normalizeScaledColumns() {
-				scaleColumns();
+        /**
+         * Depends on weightColumns() and scales each column's parameters by their
+         * respective normalized weights
+         */
+        function scaleColumns() {
+            weightColumns();
 
-				for(var i =0; i < numberOfColumns; i++) {
+            for (var i = 0; i < numberOfColumns; i++) {
+                // scaledS, scaledB, and scaledC
+                var sScaledWeighted = (normalizedColumns[i][0] - sHMin) *
+                    sHNormalizedWeight;
+                var bScaledWeighted = (normalizedColumns[i][1] - bHMin) *
+                    bHNormalizedWeight;
+                var cScaledWeighted = (normalizedColumns[i][2] - cHMin) *
+                    cHNormalizedWeight;
 
-					// Normalizes each to a factor of 1
-					var sHNormalizedScaledWeighted = scaledWeightedColumns[i][0] / (scaledWeightedColumns[i][0] + scaledWeightedColumns[i][1] + scaledWeightedColumns[i][2]);
-					var bHNormalizedScaledWeighted = scaledWeightedColumns[i][1] / (scaledWeightedColumns[i][0] + scaledWeightedColumns[i][1] + scaledWeightedColumns[i][2]);
-					var cHNormalizedScaledWeighted = scaledWeightedColumns[i][2] / (scaledWeightedColumns[i][0] + scaledWeightedColumns[i][1] + scaledWeightedColumns[i][2]);
-					normalizedScaledWeightedColumns[i] = [sHNormalizedScaledWeighted, bHNormalizedScaledWeighted, cHNormalizedScaledWeighted];
-				}
-			}
+                scaledWeightedColumns[i] = [sScaledWeighted, bScaledWeighted,
+                    cScaledWeighted
+                ];
+            }
+        }
 
-			/**
-			* Depends on normalizeScaledColumns() and transforms each column's parameters into a (x, y) point
-			* @param the scale of the canvas, the space given so points don't get miss plotted
-			*/
-			function transformColumns(scale, drawingGap) {
-				normalizeScaledColumns();
+        /**
+         * Depends on scaleColumns() and normalizes each scaled column's parameters
+         */
+        function normalizeScaledColumns() {
+            scaleColumns();
 
-				for(var i =0; i < numberOfColumns; i++) {
-					// x and y points scaled to 1
-					var yPoint = normalizedScaledWeightedColumns[i][2] * Math.sin(Math.PI / 3);
-					var xPoint = normalizedScaledWeightedColumns[i][1] + (yPoint / Math.tan(Math.PI / 3));
+            for (var i = 0; i < numberOfColumns; i++) {
 
-					// x and y points scaled to the scale
-					var scaledXPoint = xPoint * scale;
-					var scaledYPoint = (scale - (yPoint * scale)) - drawingGap;
+                // Normalizes each to a factor of 1
+                var sHNormalizedScaledWeighted = scaledWeightedColumns[i][0] /
+                    (scaledWeightedColumns[i][0] + scaledWeightedColumns[i][1] +
+                        scaledWeightedColumns[i][2]);
+                var bHNormalizedScaledWeighted = scaledWeightedColumns[i][1] /
+                    (scaledWeightedColumns[i][0] + scaledWeightedColumns[i][1] +
+                        scaledWeightedColumns[i][2]);
+                var cHNormalizedScaledWeighted = scaledWeightedColumns[i][2] /
+                    (scaledWeightedColumns[i][0] + scaledWeightedColumns[i][1] +
+                        scaledWeightedColumns[i][2]);
+                normalizedScaledWeightedColumns[i] = [
+                    sHNormalizedScaledWeighted, bHNormalizedScaledWeighted,
+                    cHNormalizedScaledWeighted
+                ];
+            }
+        }
 
-					columnPoints[i] = [scaledXPoint, scaledYPoint];
-				}
-			}
+        /**
+         * Depends on normalizeScaledColumns() and transforms each column's parameters into a (x, y) point
+         * @param the scale of the canvas, the space given so points don't get miss plotted
+         */
+        function transformColumns(scale, drawingGap) {
+            normalizeScaledColumns();
 
-			/**
-			* Depends on transformColumns(scale) and retrieves the columns' points that will be plotted
-			* @param the scale of the canvas ,the space given so points don't get miss plotted
-			* @return the (x, y) points of each column that should be plotted
-			*/
-			function retriveColumnPoints(scale, drawingGap) {
-				transformColumns(scale, drawingGap);
+            for (var i = 0; i < numberOfColumns; i++) {
+                // x and y points scaled to 1
+                var yPoint = normalizedScaledWeightedColumns[i][2] * Math.sin(
+                    Math.PI / 3);
+                var xPoint = normalizedScaledWeightedColumns[i][1] + (yPoint /
+                    Math.tan(Math.PI / 3));
 
-				return columnPoints;
-			}
+                // x and y points scaled to the scale
+                var scaledXPoint = xPoint * scale;
+                var scaledYPoint = (scale - (yPoint * scale)) - drawingGap;
 
-			/**
-			* Action Listener to draw the triangle and plot the points
-			*/
-			function clickFunction() {
-				// Checks to see if the drawingWindow needs to be initialized
-                // or if it needs to re-opened
-				if(!(drawingWindow && drawingWindow.closed == false)) {
-					drawingWindowInit();
-				}
+                columnPoints[i] = [scaledXPoint, scaledYPoint];
+            }
+        }
 
-				var canvas  = drawingWindow.document.getElementById("theCanvas");
-				var context = canvas.getContext("2d");
-				var radius = 5;
+        /**
+         * Depends on transformColumns(scale) and retrieves the columns' points that will be plotted
+         * @param the scale of the canvas ,the space given so points don't get miss plotted
+         * @return the (x, y) points of each column that should be plotted
+         */
+        function retriveColumnPoints(scale, drawingGap) {
+            transformColumns(scale, drawingGap);
 
-				// Clears canvas
-				context.clearRect(0,0,canvas.width,canvas.height);
+            return columnPoints;
+        }
 
-				// Draws comparison triangle
-				drawComparisonTriangle(canvas, context, radius * radius);
+        /**
+         * Action Listener to draw the triangle and plot the points
+         */
+        function clickFunction() {
+            // Checks to see if the drawingWindow needs to be initialized
+            // or if it needs to re-opened
+            if (!(drawingWindow && drawingWindow.closed == false)) {
+                drawingWindowInit();
+            }
 
-				// Columns to be Plotted and Scaled to Canvas
-				columnPointsToBePlotted = retriveColumnPoints(canvas.height, radius * radius);
+            var canvas = drawingWindow.document.getElementById("theCanvas");
+            var context = canvas.getContext("2d");
+            var radius = 5;
 
-				// Column of interest WILL GET SOME HOW
-				var chosenColumn = columnPointsToBePlotted[0]; // TEST;
+            // Clears canvas
+            context.clearRect(0, 0, canvas.width, canvas.height);
 
-				// Plots the columns
-				plotColumns(columnPoints, chosenColumn, canvas, context, radius);
+            // Draws comparison triangle
+            drawComparisonTriangle(canvas, context, radius * radius);
 
-// Test Writings
+            // Columns to be Plotted and Scaled to Canvas
+            columnPointsToBePlotted = retriveColumnPoints(canvas.height, radius *
+                radius);
 
-				//document.write(normalizedColumns[0][0] + " ~~~ " + normalizedColumns[0][1] + " ~~~ " + normalizedColumns[0][2] + " ~~~ " + normalizedColumns[1][0] + " ~~~ " + normalizedColumns[1][1] + " ~~~ " + normalizedColumns[1][2]);
+            // Column of interest WILL GET SOME HOW
+            var chosenColumn = columnPointsToBePlotted[0]; // TEST;
 
-				//document.write((sHMax - sHMin) + " ~~~ " + (bHMax - bHMin) + " ~~~ " + (cHMax - cHMin));
+            // Plots the columns
+            plotColumns(columnPoints, chosenColumn, canvas, context, radius);
 
-				//document.write(sHNormalizedWeight + " ~~~ " + bHNormalizedWeight + " ~~~ " + cHNormalizedWeight);
+            // Test Writings
 
-				//document.write(scaledWeightedColumns[0][0] + " ~~~ " + scaledWeightedColumns[0][1] + " ~~~ " + scaledWeightedColumns[0][2] + " ~~~ " + scaledWeightedColumns[1][0] + " ~~~ " + scaledWeightedColumns[1][1] + " ~~~ " + scaledWeightedColumns[1][2]);
+            //document.write(normalizedColumns[0][0] + " ~~~ " + normalizedColumns[0][1] + " ~~~ " + normalizedColumns[0][2] + " ~~~ " + normalizedColumns[1][0] + " ~~~ " + normalizedColumns[1][1] + " ~~~ " + normalizedColumns[1][2]);
 
-				//document.write(normalizedScaledWeightedColumns[0][0] + " ~~~ " + normalizedScaledWeightedColumns[0][1] + " ~~~ " + normalizedScaledWeightedColumns[0][2] + " ~~~ " + normalizedScaledWeightedColumns[1][0] + " ~~~ " + normalizedScaledWeightedColumns[1][1] + " ~~~ " + normalizedScaledWeightedColumns[1][2]);
+            //document.write((sHMax - sHMin) + " ~~~ " + (bHMax - bHMin) + " ~~~ " + (cHMax - cHMin));
 
-				//document.write(columnPointsToBePlotted[0][0] + " ~~~ " + columnPointsToBePlotted[0][1] + " ~~~ " + columnPointsToBePlotted[1][0] + " ~~~ " + columnPointsToBePlotted[1][1])
-			};
-		</script>
-	</body>
+            //document.write(sHNormalizedWeight + " ~~~ " + bHNormalizedWeight + " ~~~ " + cHNormalizedWeight);
+
+            //document.write(scaledWeightedColumns[0][0] + " ~~~ " + scaledWeightedColumns[0][1] + " ~~~ " + scaledWeightedColumns[0][2] + " ~~~ " + scaledWeightedColumns[1][0] + " ~~~ " + scaledWeightedColumns[1][1] + " ~~~ " + scaledWeightedColumns[1][2]);
+
+            //document.write(normalizedScaledWeightedColumns[0][0] + " ~~~ " + normalizedScaledWeightedColumns[0][1] + " ~~~ " + normalizedScaledWeightedColumns[0][2] + " ~~~ " + normalizedScaledWeightedColumns[1][0] + " ~~~ " + normalizedScaledWeightedColumns[1][1] + " ~~~ " + normalizedScaledWeightedColumns[1][2]);
+
+            //document.write(columnPointsToBePlotted[0][0] + " ~~~ " + columnPointsToBePlotted[0][1] + " ~~~ " + columnPointsToBePlotted[1][0] + " ~~~ " + columnPointsToBePlotted[1][1])
+        };
+    </script>
+</body>
+
 </html>
