@@ -18,11 +18,12 @@
 			*		<head>
 			*			<title>Drawing Window</title>
 			*		</head>
-			*		<body> <canvas id=\"theCanvas\" height=\"500\" width=\"500\" style=\"border:1px solid black\"> </body>
+			*		<body> <canvas id=\"theCanvas\" height=\"500\" width=\"500\"
+            *         style=\"border:1px solid black\"> </body>
 			*/
 			var drawingWindow;
 
-
+            // TODO: This needs to be changed to legitimate data values
 			// Test Values
 			var S1 = -0.0500;
 			var B1 = 0.0300;
@@ -49,7 +50,8 @@
 			var C5 = 0;
 			var H5 = 0.940;
 
-			var columns = [[S1, B1, C1, H1], [S2, B2, C2, H2], [S3, B3, C3, H3], [S4, B4, C4, H4], [S5, B5, C5, H5]];
+			var columns = [[S1, B1, C1, H1], [S2, B2, C2, H2], [S3, B3, C3, H3],
+                          [S4, B4, C4, H4], [S5, B5, C5, H5]];
 
 //Final		var columns = []
 
@@ -79,7 +81,7 @@
 			*/
 			function drawingWindowInit() {
 				drawingWindow  = window.open("","_blank", "resizable=yes, width=525, height=525");
-				drawingWindow.document.write("<html><head><title>Drawing Window</title></head><body><canvas id=\"theCanvas\" height=\"500\" width=\"500\"></body>");
+				drawingWindow.document.write("<html><head><title>Data Visualizer</title></head><body><canvas id=\"theCanvas\" height=\"500\" width=\"500\"></body>");
 			}
 
 			/**
@@ -87,9 +89,11 @@
 			* @param The drawing canvas, the "pen" for drawing, and space for drawing
 			*/
 			function drawComparisonTriangle(canvas, context, drawingGap) {
-				canvasLength = canvas.height; // The canvas is a square so the length of the square is ether the height or the width
+// The canvas is a square so the length of the square is ether the height or the width
+				canvasLength = canvas.height; 
 				halfCanvasLength = canvasLength / 2;
-				triangleHeight = Math.sqrt(canvasLength * canvasLength - halfCanvasLength * halfCanvasLength);
+				triangleHeight = Math.sqrt(canvasLength * canvasLength -
+                    halfCanvasLength * halfCanvasLength);
 
 				// Triangle Section
 				context.beginPath();
@@ -102,22 +106,26 @@
     			context.stroke();
 
     			// Labels
-    			context.font = "bold 32px Arial";
+    			context.font = "bold 32px Sans-Serif";
   				context.fillText("S", (canvasLength / 8), halfCanvasLength);
   				context.fillText("C", canvasLength - (canvasLength / 8), halfCanvasLength);
   				context.textAlign="center";
   				context.fillText("B", halfCanvasLength, canvasLength);
-  				context.fillText("TITLE NEEDED", halfCanvasLength, (canvasLength / 16));
+  				context.fillText("Column Visualizer", halfCanvasLength, (canvasLength / 16));
 			}
 
 			/**
 			* Plots each column as a point in the triangle
-			* @param points of the columns being plotted, point that will be highlighted, the drawing canvas, the "pen" for drawing, and size of the points being plotted
+			* @param points of the columns being plotted, point that will be
+            * highlighted, the drawing canvas, the "pen" for drawing, and size
+            * of the points being plotted
 			*/
 			function plotColumns(columns, columnOfIntrest, canvas, context, radius) {
 				//For loop for each column
     			for(var i=0; i<columns.length; i++) {
-    				if(columnOfIntrest[0] == columns[i][0] && columnOfIntrest[1] == columns[i][1]) { // Checks if the column is the column of interest
+                    // Checks if the column is the column of interest
+    				if(columnOfIntrest[0] == columns[i][0] &&
+                         columnOfIntrest[1] == columns[i][1]) { 
     					context.fillStyle="#2B65EC";
     				} else {
     					context.fillStyle="#000000";
@@ -139,13 +147,14 @@
 
 				for(var i =0; i < numberOfColumns; i++) {
 
-					// Calculates Snom, Bnorm, Cnorm
+					// Calculates sNorm, bNorm, cNorm
 					var sH = columns[i][0]/columns[i][3];
 					var bH = columns[i][1]/columns[i][3];
 					var cH = columns[i][2]/columns[i][3];
 
 					// Finds the Max and the Min of S,B, and C
-					if(i === 0) {sHMax = sH; sHMin = sH; bHMax = bH; bHMin = bH; cHMax = cH; cHMin = cH;}
+					if(i === 0) {sHMax = sH; sHMin = sH; bHMax = bH; bHMin = bH;
+                          cHMax = cH; cHMin = cH;}
 					if (sH > sHMax) { sHMax = sH;} 
 					if (sH < sHMin) { sHMin = sH;}
 					if (bH > bHMax) { bHMax = bH;} 
@@ -242,7 +251,8 @@
 			* Action Listener to draw the triangle and plot the points
 			*/
 			function clickFunction() {
-				// Checks to see if the drawingWindow needs to be initialized or if it needs to re-opened
+				// Checks to see if the drawingWindow needs to be initialized
+                // or if it needs to re-opened
 				if(!(drawingWindow && drawingWindow.closed == false)) {
 					drawingWindowInit();
 				}
