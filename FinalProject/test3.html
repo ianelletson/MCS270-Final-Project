@@ -6,17 +6,6 @@
 <head>
     <script src="jquery-csv.js"></script>
     <script>
-    var sss = $.csv.toObjects("database.csv");
-    </script>
-    <title>
-        Test Javascript for Final Project
-    </title>
-</head>
-
-<body>
-    <button type="button" onclick="clickFunction()">Test Drawing</button>
-
-    <script type="text/javascript">
         /*
          * This is the HTML code the drawing window will have in it.
          * This is needed to set the title and create the canvas in the window
@@ -329,22 +318,17 @@
 
             // Plots the columns
             plotColumns(columnPoints, chosenColumn, canvas, context, radius);
-
-            // Test Writings
-
-            //document.write(normalizedColumns[0][0] + " ~~~ " + normalizedColumns[0][1] + " ~~~ " + normalizedColumns[0][2] + " ~~~ " + normalizedColumns[1][0] + " ~~~ " + normalizedColumns[1][1] + " ~~~ " + normalizedColumns[1][2]);
-
-            //document.write((sHMax - sHMin) + " ~~~ " + (bHMax - bHMin) + " ~~~ " + (cHMax - cHMin));
-
-            //document.write(sHNormalizedWeight + " ~~~ " + bHNormalizedWeight + " ~~~ " + cHNormalizedWeight);
-
-            //document.write(scaledWeightedColumns[0][0] + " ~~~ " + scaledWeightedColumns[0][1] + " ~~~ " + scaledWeightedColumns[0][2] + " ~~~ " + scaledWeightedColumns[1][0] + " ~~~ " + scaledWeightedColumns[1][1] + " ~~~ " + scaledWeightedColumns[1][2]);
-
-            //document.write(normalizedScaledWeightedColumns[0][0] + " ~~~ " + normalizedScaledWeightedColumns[0][1] + " ~~~ " + normalizedScaledWeightedColumns[0][2] + " ~~~ " + normalizedScaledWeightedColumns[1][0] + " ~~~ " + normalizedScaledWeightedColumns[1][1] + " ~~~ " + normalizedScaledWeightedColumns[1][2]);
-
-            //document.write(columnPointsToBePlotted[0][0] + " ~~~ " + columnPointsToBePlotted[0][1] + " ~~~ " + columnPointsToBePlotted[1][0] + " ~~~ " + columnPointsToBePlotted[1][1])
         };
     </script>
+    <title>
+        Test Javascript for Final Project
+    </title>
+</head>
+
+<body>
+    <button type="button" onclick="clickFunction()">Test Drawing</button>
+
+
 </body>
 
 </html>
