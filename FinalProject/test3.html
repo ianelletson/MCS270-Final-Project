@@ -4,33 +4,27 @@
 <html>
 
 <head>
-<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-
-    <script src="http://jquery-csv.googlecode.com/git/src/jquery.csv.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
     <script>
-/*
-* This anonymous function gets the data currently stored locally
-* TODO: when we move this to production we must adjust location
-* To ensure that this runs, start a python web server from the
-* directory - python -m SimpleHTTPServer
-*/
-var dataset = []
-d3.csv("http://localhost:8000/database.csv", function(data) {
-    dataset = data.map(function(d) { return [ +d["id"], +d["H"], +d["S"],
-        +d["B"], +d["C28"] ]; });
-        console.log(dataset[0][0]);
-});
-//    .row(function(d) { return {key: d.id, value: +d.value}; })
-//    .get(function(error, rows) {console.log(rows); });
-  
-    //var strData = $.ajax({url: "database.csv", async: false}).responseText;
-//    $.get("database.csv", function(respons) {
-//        var myFile = respons;
-//    }
+        /*
+         * This anonymous function gets the data currently stored locally
+         * TODO: when we move this to production we must adjust location
+         * To ensure that this runs, start a python web server from the
+         * directory - python -m SimpleHTTPServer
+         */
+        var dataset = []
+         d3.csv("http://localhost:8000/database.csv", function (data) {
+            dataset = data.map(function (d) {
+                return [+d["id"], +d["name"], +d["H"], +d["S"], +d["B"], +
+                    d["C28"]
+                ];
+            });
+            console.log(dataset[0][0]);
+        });
 
-    // For posterity's sake, we should load the jquery-csv script locally
-    // that will need some extra work though
+         // For posterity's sake, we should load the jquery-csv script locally
+         // that will need some extra work though
         /*
          * This is the HTML code the drawing window will have in it.
          * This is needed to set the title and create the canvas in the window
@@ -45,11 +39,6 @@ d3.csv("http://localhost:8000/database.csv", function(data) {
 
          // TODO: This needs to be changed to legitimate data values
          // Test Values
-        //var columns = $.csv.toObjects("database.csv");
-       // var myColumns = $.csv.toObjects("database.csv");
-       // var testColumns = $.csv.toObjects(strData);
-       // var tv = testColumns[0][1];
-       // alert(strData[1][1]);
         var S1 = -0.0500;
         var B1 = 0.0300;
         var C1 = 0;
@@ -82,8 +71,6 @@ d3.csv("http://localhost:8000/database.csv", function(data) {
             [S4, B4, C4, H4],
             [S5, B5, C5, H5]
         ];
-
-         //Final		var columns = []
 
         var numberOfColumns = 0;
 
@@ -348,7 +335,7 @@ d3.csv("http://localhost:8000/database.csv", function(data) {
 
             // Plots the columns
             plotColumns(columnPoints, chosenColumn, canvas, context, radius);
-}
+        }
     </script>
     <title>
         Test Javascript for Final Project
