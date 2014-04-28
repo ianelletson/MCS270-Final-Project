@@ -4,8 +4,11 @@
 <html>
 
 <head>
-    <script src="jquery-csv.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="http://jquery-csv.googlecode.com/git/src/jquery.csv.js"></script>
     <script>
+    // For posterity's sake, we should load the jquery-csv script locally
+    // that will need some extra work though
         /*
          * This is the HTML code the drawing window will have in it.
          * This is needed to set the title and create the canvas in the window
@@ -20,6 +23,7 @@
 
          // TODO: This needs to be changed to legitimate data values
          // Test Values
+        var columns = $.csv.toObjects("database.csv");
         var S1 = -0.0500;
         var B1 = 0.0300;
         var C1 = 0;
@@ -45,7 +49,7 @@
         var C5 = 0;
         var H5 = 0.940;
 
-        var columns = [
+        var oldColumns = [
             [S1, B1, C1, H1],
             [S2, B2, C2, H2],
             [S3, B3, C3, H3],
