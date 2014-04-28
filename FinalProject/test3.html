@@ -15,7 +15,6 @@
          * we must call all functions from within here
          * this is because getting is asynchronous
          */
-        var sArray;
         var dataset;
         // This below will make an array based off of the headers we
         // want from the csv file.
@@ -40,7 +39,7 @@
                 return tempArray;
             }
             var hArray = makeArray(2);
-            sArray = makeArray(3);
+            var sArray = makeArray(3);
             var bArray = makeArray(4);
             var cArray = makeArray(5);
             //console.log(hArray[1]);
