@@ -175,10 +175,10 @@
                 // Checks if the column is the column of interest
                 if (columnOfIntrest[0] == columns[i][0] &&
                     columnOfIntrest[1] == columns[i][1]) {
-                    context.fillStyle = "#2B65EC";
+                    context.strokeStyle = "#FF0000";
                 }
                 else {
-                    context.fillStyle = "#000000";
+                    context.strokeStyle = "#000000";
                 }
 
                 // Drawing the point
@@ -186,7 +186,7 @@
                 context.arc(columns[i][0], columns[i][1], radius, 0, 2 * Math.PI,
                     false);
                 context.closePath();
-                context.fill();
+                context.stroke();
             }
         }
 
