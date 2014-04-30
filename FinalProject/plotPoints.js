@@ -136,7 +136,6 @@ var makePoints = function (xArray, yArray) {
  * we must call all functions from within here
  * this is because getting is asynchronous
  */
-var xy = [];
 var dataset;
 // This below will make an array based off of the headers we
 // want from the csv file.
@@ -207,7 +206,7 @@ d3.csv("http://localhost:8000/database.csv", function (data) {
         return retPoints;
     }
 
-    xy = getData(hArray, sArray, bArray, cArray);
+    data = getData(hArray, sArray, bArray, cArray);
 
     // Begin plotting. Must be done in async function
 
@@ -259,7 +258,7 @@ d3.csv("http://localhost:8000/database.csv", function (data) {
     var g = main.append("svg:g");
 
     g.selectAll("scatter-dots")
-        .data(xy)
+        .data(data)
         .enter().append("svg:circle")
             .attr("cx", function(d,i) {return x(d[0]);})
             .attr("cy", function(d) {return y(d[1]);})
