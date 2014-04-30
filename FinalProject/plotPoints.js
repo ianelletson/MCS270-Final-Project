@@ -209,5 +209,59 @@ d3.csv("http://localhost:8000/database.csv", function (data) {
 
     xy = getData(hArray, sArray, bArray, cArray);
 
-});
+    // Begin plotting. Must be done in async function
 
+    // full of magic numbers that should be eliminated
+    var margin = {top: 20, right: 15, bottom: 60, left: 60},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+
+    var x = d3.scale.linear()
+            .domain([0, d3.max(data, function(d) { return d[0];})])
+            .range([0, width]);
+    var y = d3.scale.linear()
+            .domain([0, d3.max(data, function(d) { return d[1];})])
+            .range([height, 0]);
+
+    var chart = d3.select('body')
+                .append('svg:svg')
+                .attr('width', width + margin.right + margin.left)
+                .attr('height', height + margin.top + margin.bottom)
+                .attr('class', 'chart')
+
+    var main = chart.append('g')
+                .attr('transform', 'translate(' + margin.left + ',' + margin.top
+                      + ')')
+                .attr('width', width)
+                .attr('height', height)
+                .attr('class', 'main')
+
+    // Draw x axis (we don't actually want to do this, we want a triangle)
+    var xAxis = d3.svg.axis()
+                .scale(x)
+                .orient('bottom');
+
+    main.append('g')
+        .attr('transform', 'translate(0,' + height + ')')
+        .attr('class', 'main axis date')
+        .call(xAxis);
+
+    // Draw y (see note above)
+    var yAxis = d3.svg.axis()
+                .scale(y)
+                .orient('left');
+
+    main.append('g')
+        .attr('transform', 'translate(0,0)')
+        .attr('class', 'main axis date')
+        .call(yAxis);
+
+    var g = main.append("svg:g");
+
+    g.selectAll("scatter-dots")
+        .data(xy)
+        .enter().append("svg:circle")
+            .attr("cx", function(d,i) {return x(d[0]);})
+            .attr("cy", function(d) {return y(d[1]);})
+            .attr("r", 8);
+});
