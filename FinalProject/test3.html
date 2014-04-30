@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<!--Author=Dustin Luhmann-->
+<!--Author=Dustin Luhmann, Ian Elletson, Andy Olson-->
 <html>
 
 <head>
@@ -69,6 +69,17 @@
             var sNormWeight = normWeight(sWeight, sWeight);
             var bNormWeight = normWeight(bWeight, sWeight);
             var cNormWeight = normWeight(cWeight, sWeight);
+
+            var sScaled = scaleCols(sNorm, sHMin, sNormWeight);
+            var bScaled = scaleCols(bNorm, bHMin, bNormWeight);
+            var cScaled = scaleCols(cNorm, cHMin, cNormWeight);
+
+            var sScaledNorm = scaleNormalizer(sScaled, bScaled, cScaled);
+            var bScaledNorm = scaleNormalizer(bScaled, sScaled, cScaled);
+            var cScaledNorm = scaleNormalizer(cScaled, sScaled, bScaled);
+
+            var yPoints = transformY(cScaledNorm);
+            var xPoints = transformX(bScaledNorm, yPoints);
 
          });
 
@@ -260,7 +271,61 @@
             return normalized;
         }
 
+        /**
+         * Scales the given var x
+         * @params : normalized array of x, min of x, normalized weight of x
+         * returns : an array of scaled x
+         */
+        var scaleCols = function(xArray, xMin, xNormWeight) {
+            var tempArray = []; 
+            for (var i = 0; i < xArray.length; i++) {
+                var scale = (xArray[i] - xMin) * xNormWeight;
+                tempArray.push(scale);
+            }
+            return tempArray;
+        }
 
+        /**
+         * Normalizes scaled vars
+         * @params : array of scaled values and two other vars to scale by
+         * returns : an array of normalized, scaled vars
+         */ 
+        var scaleNormalizer = function(xArray, nArray1, nArray2) {
+            var tempArray = [];
+            for (var i = 0; i < xArray.length; i++) {
+                var scaled = xArray[i] / (xArray[i] + nArray1[i] + nArray2[i]);
+                tempArray.push(scaled);
+            }
+            return tempArray;
+        }
+
+        /**
+         * Transforms scaled, normalized points to Y coordinates
+         * @params : array of scaled normalized points
+         * returns : array of scaled Y coordinates
+         */
+        var transformY = function(xArray) {
+            var tempArray = [];
+            for (var i = 0; i < xArray.length; i++) {
+                var y = xArray[i] * Math.sin(Math.PI / 3);
+                tempArray.push(y);
+            }
+            return tempArray;
+        }
+
+        /**
+         * Transforms scaled, normalized points to X coordinates
+         * @params : array of scaled, normalized points, array of Y points
+         * returns : array of scaled X coordinates
+         */
+        var transformX = function(xArray, yArray) {
+            var tempArray = [];
+            for (var i = 0; i < xArray.length; i++) {
+                var x = xArray[i] + (yArray[i] / (Math.tan(Math.PI / 3)));
+                tempArray.push(x);
+            }
+            return tempArray;
+        }
 
         /**
          * Normalizes the columns to the H value of each column
