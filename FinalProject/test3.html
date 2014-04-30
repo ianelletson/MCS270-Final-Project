@@ -31,6 +31,7 @@
             * @param : the index in dataset from which to draw data
             * return : an array of one kind of data
             */
+            // id = [0]; name = [1]; H = [2]; S = [3]; B = [4]; C = [5]
             var makeArray = function(k) {
                 tempArray = [];
                 for (var i = 0; i < dataset.length; i++) {
@@ -42,15 +43,35 @@
             var sArray = makeArray(3);
             var bArray = makeArray(4);
             var cArray = makeArray(5);
-            //console.log(hArray[1]);
-            //console.log(sArray[1]);
-            //console.log(bArray[1]);
-            //console.log(cArray[1]);
-            //console.log(dataset.length);
-        });
 
-         // For posterity's sake, we should load the jquery-csv script locally
-         // that will need some extra work though
+            // init vars used in calculations
+            // this is all going to have to be in-function unless
+            // we can figure out a less janky way
+            
+            var sNorm = normalizeCols(sArray, hArray);
+            var bNorm = normalizeCols(bArray, hArray);
+            var cNorm = normalizeCols(cArray, hArray);
+            
+            // false for min ; true for max
+            var min = false;
+            var max = true;
+            var sHMin = rangeFinder(sNorm, min);
+            var sHMax = rangeFinder(sNorm, max);
+            var bHMin = rangeFinder(bNorm, min);
+            var bHMax = rangeFinder(bNorm, max);
+            var cHMin = rangeFinder(cNorm, min);
+            var cHMax = rangeFinder(cNorm, max);
+
+            var sWeight = weight(sHMin, sHMax);
+            var bWeight = weight(bHMin, bHMax);
+            var cWeight = weight(cHMin, cHMax);
+
+            var sNormWeight = normWeight(sWeight, sWeight);
+            var bNormWeight = normWeight(bWeight, sWeight);
+            var cNormWeight = normWeight(cWeight, sWeight);
+
+         });
+
         /*
          * This is the HTML code the drawing window will have in it.
          * This is needed to set the title and create the canvas in the window
@@ -62,7 +83,6 @@
          *         style=\"border:1px solid black\"> </body>
          */
         var drawingWindow;
-         // id = [0]; name = [1]; H = [2]; S = [3]; B = [4]; C = [5]
          // TODO: This needs to be changed to legitimate data values
          // Test Values
         var S1 = 0.0500;
@@ -112,13 +132,7 @@
 
         var columnPoints = [];
 
-        var sHMax = 0;
-        var sHMin = 0;
-        var bHMax = 0;
-        var bHMin = 0;
-        var cHMax = 0;
-        var cHMin = 0;
-
+        
         /**
          * Initializer to create the drawingWindow
          */
@@ -189,6 +203,64 @@
                 context.stroke();
             }
         }
+
+        /**
+         * Normalizes columns
+         * @params : Array to normalize, Array of normalizers
+         * returns : Array of normalized values
+         */
+        var normalizeCols = function(xArray, hArray) {
+            var tempArray = [];
+            for (var i = 0; i < xArray.length; i++) {
+               var xNorm = xArray[i] / hArray[i];
+               tempArray.push(xNorm);
+            }
+            return tempArray;
+        }
+
+        /**
+         * Finds range of an array
+         * @params : Array to find range, bool (false for min, true for max)
+         * returns : A max or min determined by opt
+         * yes I know this is janky and ugly. Could be better with enums
+         */
+        var rangeFinder = function(xArray, opt) {
+            var retVal = 0;
+            for (var i = 0; i < xArray.length; i++) {
+                if (!opt) { // min calc
+                    if (xArray[i] < retVal) {
+                        retVal = xArray[i];
+                    }
+                } else { // max calc
+                    if (xArray[i] > retVal) {
+                        retVal = xArray[i];
+                    }
+                }
+            }
+           return retVal; 
+        }
+
+        /**
+         * Weights a variable by its range
+         * @params : min and maxes of that var
+         * returns : a weight for the variable
+         */
+        var weight = function(min, max) {
+            var weight = 1 / (max - min);
+            return weight;
+        }
+
+        /**
+         * Normalizes X to N (weight)
+         * @params : weight of var and weight of normalizer
+         * returns : normalized weight of var X
+         */
+        var normWeight = function(xWeight, nWeight) {
+            var normalized = (xWeight / nWeight) * 100;
+            return normalized;
+        }
+
+
 
         /**
          * Normalizes the columns to the H value of each column
