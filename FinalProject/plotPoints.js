@@ -1,103 +1,6 @@
-<!DOCTYPE html>
-
-<!--Author=Dustin Luhmann, Ian Elletson, Andy Olson-->
-<html>
-
-<head>
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-    <script>
-        /*
-         * This is the HTML code the drawing window will have in it.
-         * This is needed to set the title and create the canvas in the window
-         *  <html>
-         *      <head>
-         *          <title>Drawing Window</title>
-         *      </head>
-         *      <body> <canvas id=\"theCanvas\" height=\"500\" width=\"500\"
-         *         style=\"border:1px solid black\"> </body>
-         */
-        var drawingWindow;
-
-
-        /**
-         * Initializer to create the drawingWindow
-         */
-        function drawingWindowInit() {
-            drawingWindow = window.open("", "_blank",
-                "resizable=yes, width=525, height=525");
-            drawingWindow.document.write(
-                "<html><head><title>Data Visualizer</title></head><body><canvas id=\"theCanvas\" height=\"500\" width=\"500\"></body>"
-            );
-        }
-
-        /**
-         * Helper function to draw the Comparison Triangle
-         * @param The drawing canvas, the "pen" for drawing, and space for drawing
-         */
-        function drawComparisonTriangle(canvas, context, drawingGap) {
-            // The canvas is a square so the length of the square is ether the height or the width
-            canvasLength = canvas.height;
-            halfCanvasLength = canvasLength / 2;
-            triangleHeight = Math.sqrt(canvasLength * canvasLength -
-                halfCanvasLength * halfCanvasLength);
-
-            // Triangle Section
-            context.beginPath();
-            context.moveTo(0, canvasLength - drawingGap);
-            context.lineTo(canvasLength, canvasLength - drawingGap);
-            context.lineTo(halfCanvasLength, (canvasLength - triangleHeight) -
-                drawingGap);
-            context.lineTo(0, canvasLength - drawingGap);
-            context.closePath();
-            context.strokeStyle = "#000000";
-            context.stroke();
-
-            // Labels
-            context.font = "bold 32px Sans-Serif";
-            context.fillText("S", (canvasLength / 8), halfCanvasLength);
-            context.fillText("C", canvasLength - (canvasLength / 8),
-                halfCanvasLength);
-            context.textAlign = "center";
-            context.fillText("B", halfCanvasLength, canvasLength);
-            context.fillText("Column Visualizer", halfCanvasLength, (
-                canvasLength / 16));
-        }
-
-        /**
-         * Plots each column as a point in the triangle
-         * @param points of the columns being plotted, point that will be
-         * highlighted, the drawing canvas, the "pen" for drawing, and size
-         * of the points being plotted
-         */
-        function plotColumns(columns, columnOfIntrest, canvas, context, radius) {
-            //For loop for each column
-            var colInt;
-            for (var i = 0; i < columns.length; i++) {
-                // Checks if the column is the column of interest
-                if (columnOfIntrest[0] == columns[i][0] &&
-                    columnOfIntrest[1] == columns[i][1]) {
-                    colInt = [columns[i][0], columns[i][1]];
-                }
-                else {
-                    context.strokeStyle = "#3D352A";
-                }
-
-                // Drawing the point
-                context.beginPath();
-                context.arc(columns[i][0], columns[i][1], radius, 0, 2 * Math.PI,
-                    false);
-                context.closePath();
-                context.stroke();
-            }
-                // Drawing the point
-                context.strokeStyle = "#FF0000";
-                context.beginPath();
-                context.arc(colInt[0], colInt[1], radius, 0, 2 * Math.PI,
-                    false);
-                context.closePath();
-                context.stroke();
-        }
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js">
+</script>
 
         /**
          * Normalizes columns
@@ -246,11 +149,6 @@
          * Action Listener to draw the triangle and plot the points
          */
         function clickFunction() {
-            // Checks to see if the drawingWindow needs to be initialized
-            // or if it needs to re-opened
-            if (!(drawingWindow && drawingWindow.closed == false)) {
-                drawingWindowInit();
-            }
 
             /*
              * This anonymous function gets the data currently stored locally
@@ -289,17 +187,13 @@
                 var bArray = makeArray(4);
                 var cArray = makeArray(5);
 
-                var canvas = drawingWindow.document.getElementById(
-                    "theCanvas");
-                var context = canvas.getContext("2d");
-                var radius = 5;
+                xy = getData(hArray, sArray, bArray, cArray);
 
                 /**
                  * Does all the work required other than making initial arrays
                  * @params : data for each variable from the csv
                  * returns : 2D array of x and y values
                  */
-                // TODO this still uses non-param vars for scaling purposes
                 var getData = function(hArray, sArray, bArray, cArray) {
                     var sNorm = normalizeCols(sArray, hArray);
                     var bNorm = normalizeCols(bArray, hArray);
@@ -333,48 +227,9 @@
 
                     var yPoints = transformY(cScaledNorm);
                     var xPoints = transformX(bScaledNorm, yPoints);
-                    var retPoints = scalePoints(xPoints, yPoints, canvas.height,
-                                                radius * radius);
+                    var retPoints = makePoints(xPoints, yPoints);
                 return retPoints;
                 }
 
-                xy = getData(hArray, sArray, bArray, cArray);
-
-
-
-
-
-                // xy = scalePoints(xPoints, yPoints, canvas.height, radius *
-                //     radius);
-
-                // Clears canvas
-                context.clearRect(0, 0, canvas.width, canvas.height);
-
-                // Draws comparison triangle
-                drawComparisonTriangle(canvas, context, radius * radius);
-
-                columnPointsToBePlotted = xy;
-                // columnPoints = xy;
-
-                // Column of interest WILL GET SOME HOW
-                var chosenColumn = columnPointsToBePlotted[0]; // TEST;
-
-                // Plots the columns
-                plotColumns(xy, chosenColumn, canvas, context, radius);
             });
-
-
         }
-    </script>
-    <title>
-        Test Javascript for Final Project
-    </title>
-</head>
-
-<body>
-    <button type="button" onclick="clickFunction()">Test Drawing</button>
-
-
-</body>
-
-</html>
