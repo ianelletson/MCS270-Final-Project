@@ -72,14 +72,15 @@
          */
         function plotColumns(columns, columnOfIntrest, canvas, context, radius) {
             //For loop for each column
+            var colInt;
             for (var i = 0; i < columns.length; i++) {
                 // Checks if the column is the column of interest
                 if (columnOfIntrest[0] == columns[i][0] &&
                     columnOfIntrest[1] == columns[i][1]) {
-                    context.strokeStyle = "#FF0000";
+                    colInt = [columns[i][0], columns[i][1]];
                 }
                 else {
-                    context.strokeStyle = "#000000";
+                    context.strokeStyle = "#3D352A";
                 }
 
                 // Drawing the point
@@ -89,6 +90,13 @@
                 context.closePath();
                 context.stroke();
             }
+                // Drawing the point
+                context.strokeStyle = "#FF0000";
+                context.beginPath();
+                context.arc(colInt[0], colInt[1], radius, 0, 2 * Math.PI,
+                    false);
+                context.closePath();
+                context.stroke();
         }
 
         /**
