@@ -8,6 +8,87 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
     <script>
         /*
+         * This anonymous function gets the data currently stored locally
+         * TODO: when we move this to production we must adjust location
+         * To ensure that this runs, start a python web server from the
+         * directory - python -m SimpleHTTPServer
+         * we must call all functions from within here
+         * this is because getting is asynchronous
+         */
+        var xy = [];
+        var dataset;
+        // This below will make an array based off of the headers we
+        // want from the csv file.
+         d3.csv("http://localhost:8000/database.csv", function (data) {
+            dataset = data.map(function (d) {
+                return [+d["id"], +d["name"], +d["H"], +d["S"], +d["B"], +
+                    d["C28"]
+                ];
+            });
+            //console.log(dataset[610][3]);
+            //console.log(dataset[0][2]);
+            
+            /*
+            * @param : the index in dataset from which to draw data
+            * return : an array of one kind of data
+            */
+            // id = [0]; name = [1]; H = [2]; S = [3]; B = [4]; C = [5]
+            var makeArray = function(k) {
+                tempArray = [];
+                for (var i = 0; i < dataset.length; i++) {
+                    tempArray.push(parseFloat(dataset[i][k]));
+                }
+                return tempArray;
+            }
+            var hArray = makeArray(2);
+            var sArray = makeArray(3);
+            var bArray = makeArray(4);
+            var cArray = makeArray(5);
+
+            // init vars used in calculations
+            // this is all going to have to be in-function unless
+            // we can figure out a less janky way
+            
+            var sNorm = normalizeCols(sArray, hArray);
+            var bNorm = normalizeCols(bArray, hArray);
+            var cNorm = normalizeCols(cArray, hArray);
+            
+            // false for min ; true for max
+            var min = false;
+            var max = true;
+            var sHMin = rangeFinder(sNorm, min);
+            var sHMax = rangeFinder(sNorm, max);
+            var bHMin = rangeFinder(bNorm, min);
+            var bHMax = rangeFinder(bNorm, max);
+            var cHMin = rangeFinder(cNorm, min);
+            var cHMax = rangeFinder(cNorm, max);
+
+            var sWeight = weight(sHMin, sHMax);
+            var bWeight = weight(bHMin, bHMax);
+            var cWeight = weight(cHMin, cHMax);
+
+            var sNormWeight = normWeight(sWeight, sWeight);
+            var bNormWeight = normWeight(bWeight, sWeight);
+            var cNormWeight = normWeight(cWeight, sWeight);
+
+            var sScaled = scaleCols(sNorm, sHMin, sNormWeight);
+            var bScaled = scaleCols(bNorm, bHMin, bNormWeight);
+            var cScaled = scaleCols(cNorm, cHMin, cNormWeight);
+
+            var sScaledNorm = scaleNormalizer(sScaled, bScaled, cScaled);
+            var bScaledNorm = scaleNormalizer(bScaled, sScaled, cScaled);
+            var cScaledNorm = scaleNormalizer(cScaled, sScaled, bScaled);
+
+            var yPoints = transformY(cScaledNorm); // yPoints must come before x
+            var xPoints = transformX(bScaledNorm, yPoints);
+            xy = makePoints(xPoints, yPoints);
+
+            var testFun = function() {
+                console.log("test");
+            }
+         });
+
+        /*
          * This is the HTML code the drawing window will have in it.
          * This is needed to set the title and create the canvas in the window
          *	<html>
@@ -265,22 +346,6 @@
         }
 
         /**
-         * Scales points using Dustin's scale
-         * @params array of x, y points, scale, drawing gap (what are those?)
-         * returns array of [x,y]
-         */
-        var scalePoints = function(xArray, yArray, scale, drawingGap) {
-            var tempArray = [];
-            for (var i = 0; i < xArray.length; i++) {
-                var scaledX = xArray[i] * scale;
-                var scaledY = (scale - (yArray[i] * scale)) - drawingGap;
-
-                tempArray[i] = [scaledX, scaledY];
-            }
-            return tempArray;
-        }
-
-        /**
          * Normalizes the columns to the H value of each column
          */
         function normalizeColumns() {
@@ -407,7 +472,6 @@
                 var scaledXPoint = xPoint * scale;
                 var scaledYPoint = (scale - (yPoint * scale)) - drawingGap;
 
-                // HUGE side effect
                 columnPoints[i] = [scaledXPoint, scaledYPoint];
             }
         }
@@ -433,88 +497,10 @@
                 drawingWindowInit();
             }
 
-        /*
-         * This anonymous function gets the data currently stored locally
-         * TODO: when we move this to production we must adjust location
-         * To ensure that this runs, start a python web server from the
-         * directory - python -m SimpleHTTPServer
-         * we must call all functions from within here
-         * this is because getting is asynchronous
-         */
-        var xy = [];
-        var dataset;
-        // This below will make an array based off of the headers we
-        // want from the csv file.
-         d3.csv("http://localhost:8000/database.csv", function (data) {
-            dataset = data.map(function (d) {
-                return [+d["id"], +d["name"], +d["H"], +d["S"], +d["B"], +
-                    d["C28"]
-                ];
-            });
-            //console.log(dataset[610][3]);
-            //console.log(dataset[0][2]);
-            
-            /*
-            * @param : the index in dataset from which to draw data
-            * return : an array of one kind of data
-            */
-            // id = [0]; name = [1]; H = [2]; S = [3]; B = [4]; C = [5]
-            var makeArray = function(k) {
-                tempArray = [];
-                for (var i = 0; i < dataset.length; i++) {
-                    tempArray.push(parseFloat(dataset[i][k]));
-                }
-                return tempArray;
-            }
-            var hArray = makeArray(2);
-            var sArray = makeArray(3);
-            var bArray = makeArray(4);
-            var cArray = makeArray(5);
-
-            // init vars used in calculations
-            // this is all going to have to be in-function unless
-            // we can figure out a less janky way
-            
-            var sNorm = normalizeCols(sArray, hArray);
-            var bNorm = normalizeCols(bArray, hArray);
-            var cNorm = normalizeCols(cArray, hArray);
-            
-            // false for min ; true for max
-            var min = false;
-            var max = true;
-            var sHMin = rangeFinder(sNorm, min);
-            var sHMax = rangeFinder(sNorm, max);
-            var bHMin = rangeFinder(bNorm, min);
-            var bHMax = rangeFinder(bNorm, max);
-            var cHMin = rangeFinder(cNorm, min);
-            var cHMax = rangeFinder(cNorm, max);
-
-            var sWeight = weight(sHMin, sHMax);
-            var bWeight = weight(bHMin, bHMax);
-            var cWeight = weight(cHMin, cHMax);
-
-            var sNormWeight = normWeight(sWeight, sWeight);
-            var bNormWeight = normWeight(bWeight, sWeight);
-            var cNormWeight = normWeight(cWeight, sWeight);
-
-            var sScaled = scaleCols(sNorm, sHMin, sNormWeight);
-            var bScaled = scaleCols(bNorm, bHMin, bNormWeight);
-            var cScaled = scaleCols(cNorm, cHMin, cNormWeight);
-
-            var sScaledNorm = scaleNormalizer(sScaled, bScaled, cScaled);
-            var bScaledNorm = scaleNormalizer(bScaled, sScaled, cScaled);
-            var cScaledNorm = scaleNormalizer(cScaled, sScaled, bScaled);
-
-            var yPoints = transformY(cScaledNorm); // yPoints must come before x
-            var xPoints = transformX(bScaledNorm, yPoints);
-            
-
             var canvas = drawingWindow.document.getElementById("theCanvas");
             var context = canvas.getContext("2d");
             var radius = 5;
 
-            xy = scalePoints(xPoints, yPoints, canvas.height, radius * radius);
-            
             // Clears canvas
             context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -522,21 +508,14 @@
             drawComparisonTriangle(canvas, context, radius * radius);
 
             columnPointsToBePlotted = xy;
-            columnPoints = xy;
-
-            // columnPointsToBePlotted = retriveColumnPoints(canvas.height, radius *
-            //   radius);
-            // There is a huge side effect in the retriveColumnPoints function
-            // that sets the value of columnPoints as well
+           // columnPointsToBePlotted = retriveColumnPoints(canvas.height, radius *
+           //     radius);
 
             // Column of interest WILL GET SOME HOW
             var chosenColumn = columnPointsToBePlotted[0]; // TEST;
 
             // Plots the columns
             plotColumns(columnPoints, chosenColumn, canvas, context, radius);
-         });
-
-
         }
     </script>
     <title>
