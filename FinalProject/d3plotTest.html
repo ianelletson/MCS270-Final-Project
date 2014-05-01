@@ -285,7 +285,9 @@ d3.csv("http://localhost:8000/database.csv", function (data) {
 }
 
 circle {
-    fill: steelblue;
+    shape-rendering: smoothEdges;
+    stroke: steelblue;
+    fill: none;
 }
 </style>
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
