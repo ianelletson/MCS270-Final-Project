@@ -27,7 +27,6 @@
 var drawingWindow;
 var drawingWindowWidth = 500;
 var drawingWindowHeight = 500;
-var htmlTheGapForAll = 50;
 var isQuickZoomedIn = false;
 var isColumnClicked = false;
 var points;
@@ -64,7 +63,7 @@ function drawingWindowInit() {
 
     // Replaces the value holder with the correct value
     drawingWindowDetails = drawingWindowDetails.replace("%s1", "" + drawingWindowWidth).replace("%s2", "" + drawingWindowHeight);
-    canvasDetails = canvasDetails.replace("%s1", "" + (drawingWindowWidth * .95)).replace("%s2", "" + ((drawingWindowHeight - htmlTheGapForAll) * .95));
+    canvasDetails = canvasDetails.replace("%s1", "" + (drawingWindowWidth * .95)).replace("%s2", "" + (drawingWindowHeight * .95));
 
     // Creates the window with the appropriate details
     drawingWindow = window.open("", "_blank", drawingWindowDetails);
@@ -146,7 +145,7 @@ function resizeCanvas() {
     var maxLength = Math.max(drawingWindow.innerWidth, drawingWindow.innerHeight);
 
     canvas.width = maxLength * .95;
-    canvas.height = (maxLength - htmlTheGapForAll) * .95;
+    canvas.height = maxLength * .95;
     var context = canvas.getContext("2d");
 
     isQuickZoomedIn = false;
@@ -166,6 +165,7 @@ function quickZoom() {
         drawingWindow.scrollBy(canvas.width / 4, canvas.height / 4);
     } else {
         zoomOut();
+        drawingWindow.scrollTo((canvas.width / 2 - (drawingWindow.innerWidth / 2)), (canvas.height / 2 - (drawingWindow.innerHeight / 2)));
         isQuickZoomedIn = false;
     }
 }
@@ -391,7 +391,7 @@ function helpFunction() {
     // Creates the window with the appropriate details
     helpWindow = window.open("", "_blank", helpWindowDetails);
 
-    helpWindow.document.write("TODO FILL THIS OUT IAN");
+    helpWindow.document.write("- Each column is represented as a hollow circle on the graph. <br>- Hover over a circle to view  the column it represents. Click on a column to select it. <br>- Zoom in by clicking the '+' button <br>- Zoom out by clicking the '-' button. <br>- Quick zoom in and out by double clicking anywhere on the graph.");
     }
 
 /**
